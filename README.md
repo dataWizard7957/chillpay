@@ -4,7 +4,7 @@ Chill Pay is a local payroll and invoice app. Each account is its own company. N
 
 The chat model only reads a note. It does not calculate money. Pay is calculated in `app/services/payroll_engine.py`.
 
-## What you can do
+## Features
 
 The side panel has four pages.
 
