@@ -24,23 +24,7 @@ Finance sees Records only. A member or a Department Head sees This month and Rec
 
 ## Pay
 
-For a monthly member:
-
-- A month is 30 days for pay. Daily rate = monthly payment / 30.
-- Final leaves = total leaves − comp-off.
-- Final extra days = extra work days − comp-off.
-- Comp-off cannot be larger than leaves or extra days, and it is entered in steps of 0.5.
-- Final payment = monthly payment − (final leaves × daily rate) + (final extra days × daily rate).
-- Gross payable = final payment + overtime + project allowance + project bonus + one-off bonus.
-- Contract members pay TDS, 10% of gross by default. Employees and trainees pay no TDS. A trainee line is labelled Stipend.
-- Amount paid = gross − TDS.
-- Amounts use decimal arithmetic and round half-up to 2 decimal places.
-
-The invoice period is the real calendar month, such as 01-Aug-2026 to 31-Aug-2026. September is 01-Sep-2026 to 30-Sep-2026. The pay formula still divides by 30.
-
-An invoice number is the first two letters of the first name, the first two letters of the last name, `_INV`, and the billing year and month. Raj Kumar in September 2026 is `RAKU_INV202609`. A second member with the same initials gets `_2`. A one-word name is refused until a last name is saved.
-
-A month before the member's joining date cannot be approved. Chat cannot approve or reject.
+Python does maths
 
 ## Setup
 
