@@ -40,6 +40,8 @@ npm install
 
 Copy `.env.example` to `.env` if you want to change defaults. The app runs without that file. The database is created at `data/chill_pay.sqlite3`. Starting the API upgrades the database.
 
+Sign-in is off by default for this prototype: every request acts as one built-in HR user. To require sign-in, put `CHILLPAY_NO_AUTH=false` in `.env`.
+
 Optional, before storing PAN:
 
 ```
@@ -71,6 +73,8 @@ Open `http://127.0.0.1:5173/`. The API health check is `http://127.0.0.1:8000/he
 On the sign-in screen, choose **Create a company account**. Enter an email, a password of at least 8 characters, and a company name. That creates an empty company and signs you in as its HR user. A later sign-in must use that same password. Another email creates a different company and cannot see this company's members, pay, or invoices.
 
 If this database already had members before company accounts, those rows belong to the company named Existing company. Sign in with the password from the first time that email was created.
+
+`py -3.12 -m scripts.seed_demo` fills an empty database with made-up demo members and last month's run, ready for review. Render runs it on every start; it does nothing once data exists.
 
 `py -3.12 -m app.cli create-admin` creates one HR user only when the database has no users yet.
 

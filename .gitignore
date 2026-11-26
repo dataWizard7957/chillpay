@@ -4,6 +4,7 @@ __pycache__/
 *.pyc
 .env
 data/*.sqlite3
+data/invoices/
 backups/*/
 backups/*.sqlite3
 frontend/node_modules/
