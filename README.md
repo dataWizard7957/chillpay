@@ -2,6 +2,8 @@
 
 Chill Pay is a local payroll and invoice app. Each account is its own company. Notes for a month are reviewed by a person, then Python calculates the pay and creates one invoice per member.
 
+**Live demo:** https://chillpay.onrender.com — demo data, no sign-in. It resets on every restart.
+
 The chat model only reads a note. It does not calculate money. Pay is calculated in `app/services/payroll_engine.py`.
 
 ## Features
