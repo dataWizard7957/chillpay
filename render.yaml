@@ -1,0 +1,35 @@
+# Render Blueprint: one web service runs the API and serves the built frontend.
+services:
+  - type: web
+    name: chillpay
+    runtime: python
+    plan: starter # a persistent disk needs a paid plan
+    buildCommand: pip install -r requirements.txt && cd frontend && npm ci && npm run build
+    # Seeds made-up demo data into an empty database (never duplicates), then starts.
+    startCommand: python -m scripts.seed_demo && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    disk:
+      name: chillpay-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: CHILLPAY_DATABASE_URL
+        value: sqlite:////var/data/chill_pay.sqlite3
+      - key: CHILLPAY_INVOICE_DIR
+        value: /var/data/invoices
+      - key: CHILLPAY_BACKUP_DIR
+        value: /var/data/backups
+      - key: CHILLPAY_SESSION_SECURE
+        value: "true"
+      # WARNING: sign-in is off. Anyone with the URL is HR and can see and change
+      # all pay data. Use demo data only. Set to "false" to require sign-in.
+      - key: CHILLPAY_NO_AUTH
+        value: "true"
+      # Optional, needed only before storing PAN. Generate each with:
+      # py -3.12 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+      - key: CHILLPAY_ENCRYPTION_KEY
+        sync: false
+      - key: CHILLPAY_LOOKUP_KEY
+        sync: false

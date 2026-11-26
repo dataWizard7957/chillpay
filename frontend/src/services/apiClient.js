@@ -4,7 +4,8 @@ let csrfToken = "";
 let sessionPromise = null;
 
 export function apiBaseUrl() {
-  return import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL;
+  // A production build is served by the API itself, so it calls its own address.
+  return import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? "" : DEFAULT_API_BASE_URL);
 }
 
 export function rememberCsrfToken(token) {

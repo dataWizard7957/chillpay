@@ -5,8 +5,10 @@ in the environment. Their SDKs are not imported here.
 """
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.advances import router as advances_router
@@ -83,7 +85,33 @@ def create_app(database_url: str | None = None) -> FastAPI:
     def health() -> dict:
         return {"status": "ok"}
 
+    _serve_frontend(app)
     return app
+
+
+FRONTEND_DIST = Path(__file__).resolve().parents[1] / "frontend" / "dist"
+
+
+def _serve_frontend(app: FastAPI) -> None:
+    """Serve the built React app (frontend/dist) from the same address as the API.
+
+    Only active after `npm run build`; local development still uses Vite.
+    Registered last, so every API route takes precedence.
+    """
+
+    index = FRONTEND_DIST / "index.html"
+    if not index.is_file():
+        return
+    root = FRONTEND_DIST.resolve()
+
+    @app.get("/{path:path}", include_in_schema=False)
+    def frontend(path: str):
+        candidate = (FRONTEND_DIST / path).resolve()
+        if path and candidate.is_file() and candidate.is_relative_to(root):
+            return FileResponse(candidate)
+        if path.startswith("assets/"):
+            raise HTTPException(status_code=404)
+        return FileResponse(index)
 
 
 app = create_app()
