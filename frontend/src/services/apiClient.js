@@ -25,7 +25,7 @@ export function loadSession() {
     sessionPromise = apiRequest("/auth/me")
       .then((body) => {
         rememberCsrfToken(body.csrf_token);
-        return body.user;
+        return body.auth_disabled ? { ...body.user, authDisabled: true } : body.user;
       })
       .catch((error) => {
         sessionPromise = null;

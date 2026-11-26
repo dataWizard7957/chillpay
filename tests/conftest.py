@@ -22,6 +22,8 @@ DISABLED_INTEGRATIONS = {
     "CHILLPAY_VOICE": "false",
     "CHILLPAY_TRACING": "false",
     "CHILLPAY_EMAIL": "false",
+    # Sign-in is off by default in the app; tests run with it on.
+    "CHILLPAY_NO_AUTH": "false",
 }
 
 

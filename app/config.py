@@ -37,6 +37,14 @@ def get_database_url() -> str:
     return os.environ.get("CHILLPAY_DATABASE_URL", DEFAULT_DATABASE_URL)
 
 
+def auth_disabled() -> bool:
+    """Sign-in is off by default for prototyping: every request acts as one built-in
+    HR user. Set CHILLPAY_NO_AUTH=0 (or false) to require sign-in."""
+
+    raw = os.environ.get("CHILLPAY_NO_AUTH", "").strip().casefold()
+    return raw == "" or raw in _TRUE_VALUES
+
+
 def ollama_model_name() -> str:
     raw = os.environ.get("CHILLPAY_OLLAMA_MODEL", "").strip()
     return raw or DEFAULT_OLLAMA_MODEL

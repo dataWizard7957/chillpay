@@ -9,7 +9,7 @@ from app.auth.dependencies import get_db, require_csrf, require_user
 from app.auth.passwords import dummy_password_hash, verify_password
 from app.auth.sessions import create_session, revoke_session
 from app.auth.tokens import hash_token, new_token
-from app.config import session_absolute_hours, session_cookie_name, session_cookie_secure
+from app.config import auth_disabled, session_absolute_hours, session_cookie_name, session_cookie_secure
 from app.db.models import User, utcnow
 from app.services.accounts import register_company
 from app.services.errors import ServiceError
@@ -89,7 +89,8 @@ def logout(
     response: Response,
     _user: User = Depends(require_csrf),
 ) -> dict:
-    revoke_session(request.state.auth_session)
+    if request.state.auth_session is not None:
+        revoke_session(request.state.auth_session)
     response.delete_cookie(
         key=session_cookie_name(),
         path="/",
@@ -108,5 +109,9 @@ def me(request: Request, user: User = Depends(require_user)) -> dict:
     """
 
     token = new_token()
-    request.state.auth_session.csrf_token_hash = hash_token(token)
-    return {"csrf_token": token, "user": _user_payload(user)}
+    if request.state.auth_session is not None:
+        request.state.auth_session.csrf_token_hash = hash_token(token)
+    body = {"csrf_token": token, "user": _user_payload(user)}
+    if auth_disabled():
+        body["auth_disabled"] = True
+    return body

@@ -137,9 +137,11 @@ export function Workspace() {
             <strong>{user.email}</strong>
             <span>{roleLabel(user.role)}</span>
           </p>
-          <button type="button" className="nav-item" onClick={logout}>
-            Sign out
-          </button>
+          {user.authDisabled ? null : (
+            <button type="button" className="nav-item" onClick={logout}>
+              Sign out
+            </button>
+          )}
         </div>
       </nav>
       <div className="workspace">

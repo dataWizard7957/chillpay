@@ -271,3 +271,25 @@ def test_create_app_can_use_a_temporary_database(auth_db):
     url, _user_id = auth_db
     app = create_app(database_url=url)
     assert app.state.database_url == url
+
+
+def test_sign_in_is_off_by_default(tmp_path, monkeypatch):
+    monkeypatch.delenv("CHILLPAY_NO_AUTH")
+    url = f"sqlite:///{(tmp_path / 'noauth.sqlite3').as_posix()}"
+    upgrade_database(url)
+    client = TestClient(create_app(database_url=url))
+
+    me = client.get("/auth/me")
+    assert me.status_code == 200
+    assert me.json()["user"]["role"] == "hr"
+    assert me.json()["auth_disabled"] is True
+
+    created = client.post("/departments", json={"name": "Legal"})
+    assert created.status_code == 200
+    assert client.post("/auth/logout", json={}).status_code == 200
+
+
+def test_sign_in_required_when_no_auth_is_false(client):
+    response = client.get("/auth/me")
+    assert response.status_code == 401
+    assert "auth_disabled" not in response.json()
