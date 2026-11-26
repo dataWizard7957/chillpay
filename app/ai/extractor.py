@@ -8,6 +8,7 @@ are saved or submitted.
 import http.client
 import json
 import logging
+import re
 import threading
 import time
 from decimal import Decimal
@@ -162,6 +163,7 @@ def extract_payroll_note(note: str, *, model_client, known_members=None, model_n
 
     parsed = _parse_json_object(raw_response)
     members, unmatched_names = _clean_members(parsed, known_members)
+    _drop_unmentioned_hours(note, members)
     validation_errors = []
     for member in members:
         validation_errors.extend(_validate_extracted_fields(member))
@@ -268,6 +270,23 @@ def _clean_members(parsed: dict, known_members) -> tuple[list[dict], list[str]]:
                 record[extra] = _numeric_value(item.get(extra))
         cleaned.append(record)
     return cleaned, unmatched
+
+
+_HOURS_WORDS = re.compile(r"\b(hours?|hrs?)\b", re.IGNORECASE)
+_OVERTIME_WORDS = re.compile(r"\b(overtime|ot)\b", re.IGNORECASE)
+
+
+def _drop_unmentioned_hours(note: str, members: list[dict]) -> None:
+    """The model sometimes copies day counts into hour fields. Keep hours only
+    when the note actually talks about hours (or overtime)."""
+
+    mentions_hours = bool(_HOURS_WORDS.search(note))
+    mentions_overtime = mentions_hours or bool(_OVERTIME_WORDS.search(note))
+    for member in members:
+        if not mentions_hours:
+            member["hours_worked"] = Decimal("0")
+        if not mentions_overtime:
+            member["overtime_hours"] = Decimal("0")
 
 
 def _fields_from_member(member: dict | None) -> dict:
