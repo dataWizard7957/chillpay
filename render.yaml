@@ -3,24 +3,17 @@ services:
   - type: web
     name: chillpay
     runtime: python
-    plan: starter # a persistent disk needs a paid plan
+    # Free plan: no persistent disk, so data resets on every restart, deploy, or
+    # wake from sleep, and the demo data is loaded again. To keep data, use
+    # plan: starter with a disk and point the CHILLPAY_*_DIR / DATABASE_URL there.
+    plan: free
     buildCommand: pip install -r requirements.txt && cd frontend && npm ci && npm run build
     # Seeds made-up demo data into an empty database (never duplicates), then starts.
     startCommand: python -m scripts.seed_demo && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
-    disk:
-      name: chillpay-data
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.8
-      - key: CHILLPAY_DATABASE_URL
-        value: sqlite:////var/data/chill_pay.sqlite3
-      - key: CHILLPAY_INVOICE_DIR
-        value: /var/data/invoices
-      - key: CHILLPAY_BACKUP_DIR
-        value: /var/data/backups
       - key: CHILLPAY_SESSION_SECURE
         value: "true"
       # WARNING: sign-in is off. Anyone with the URL is HR and can see and change
